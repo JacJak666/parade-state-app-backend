@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Recruit {
+  id        String         @id // 4-digit string e.g. "1203"
+  platoon   Int
+  section   Int
+  bed       Int
+  createdAt DateTime       @default(now())
+  statuses  StatusRecord[]
+}
+
+enum StatusType {
+  MC
+  LD
+  EX
+  SEND_OUT_URGENT
+  SEND_OUT_NON_URGENT
+  REPORTING_SICK
+  OTHERS
+}
+
+model StatusRecord {
+  id        String     @id @default(uuid())
+  recruitId String
+  type      StatusType
+  startDate DateTime
+  endDate   DateTime
+  remark    String     @default("")
+  createdAt DateTime   @default(now())
+
+  recruit Recruit @relation(fields: [recruitId], references: [id], onDelete: Cascade)
+
+  @@index([recruitId])
+  @@index([startDate, endDate])
+}

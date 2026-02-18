@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parade State App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid #4d678b;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 { font-size: 20px; font-weight: 600; color: #f1f5f9; }
+    .badge { background: #059669; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+
+    nav {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      padding: 0 24px;
+    }
+    nav button {
+      background: none; border: none; color: #94a3b8;
+      padding: 12px 20px; cursor: pointer; font-size: 14px; font-weight: 500;
+      border-bottom: 2px solid transparent; transition: all 0.15s;
+    }
+    nav button:hover { color: #e2e8f0; }
+    nav button.active { color: #38bdf8; border-bottom-color: #38bdf8; }
+
+    main { max-width: 1000px; margin: 0 auto; padding: 24px; }
+
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .card h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #f1f5f9; }
+
+    .form-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 12px; color: #94a3b8; font-weight: 500; }
+
+    input, select {
+      background: #0f172a; border: 1px solid #334155; color: #e2e8f0;
+      padding: 8px 12px; border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.15s;
+    }
+    input:focus, select:focus { border-color: #38bdf8; }
+    input[type="text"] { width: 140px; }
+    input[type="date"] { width: 155px; }
+    select { width: 200px; }
+    input.remark { width: 200px; }
+
+    .btn {
+      padding: 8px 16px; border-radius: 6px; border: none;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-danger { background: #dc2626; color: white; padding: 4px 10px; font-size: 12px; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-secondary { background: #334155; color: #e2e8f0; }
+    .btn-secondary:hover { background: #475569; }
+
+    /* Platoon checkboxes */
+    .platoon-selector { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .platoon-selector label { font-size: 13px; color: #94a3b8; font-weight: 500; }
+    .platoon-checkboxes { display: flex; gap: 8px; flex-wrap: wrap; }
+    .platoon-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: #0f172a; border: 1px solid #334155; border-radius: 6px;
+      padding: 6px 12px; cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .platoon-chip:hover { border-color: #38bdf8; }
+    .platoon-chip.selected { background: #1e3a5f; border-color: #38bdf8; color: #38bdf8; }
+    .platoon-chip input[type="checkbox"] { display: none; }
+    .platoon-chip span { font-size: 13px; font-weight: 500; }
+
+    .controls-row {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .controls-row label { font-size: 13px; color: #94a3b8; }
+
+    .toast {
+      position: fixed; top: 20px; right: 20px;
+      padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      z-index: 1000; animation: slideIn 0.3s ease; max-width: 400px;
+    }
+    .toast.success { background: #059669; color: white; }
+    .toast.error { background: #dc2626; color: white; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+      text-align: left; padding: 10px 12px; color: #94a3b8;
+      font-weight: 500; font-size: 12px; text-transform: uppercase;
+      letter-spacing: 0.5px; border-bottom: 1px solid #334155;
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid #1e293b55; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #ffffff08; }
+
+    .type-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 11px; font-weight: 600;
+    }
+    .type-MC { background: #7f1d1d; color: #fca5a5; }
+    .type-LD { background: #713f12; color: #fde047; }
+    .type-EX { background: #14532d; color: #86efac; }
+    .type-REPORTING_SICK { background: #312e81; color: #a5b4fc; }
+    .type-OTHERS, .type-SEND_OUT_URGENT, .type-SEND_OUT_NON_URGENT { background: #334155; color: #94a3b8; }
+
+    .parade-output {
+      background: #0f172a; border: 1px solid #334155; border-radius: 6px;
+      padding: 20px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 13px; line-height: 1.65; white-space: pre-wrap;
+      max-height: 560px; overflow-y: auto; word-break: break-word;
+    }
+
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-header h2 { margin-bottom: 0; }
+    .card-header .actions { display: flex; gap: 8px; }
+
+    .stats-row { display: flex; gap: 12px; margin-bottom: 16px; }
+    .stat-card {
+      background: #1e293b; border: 1px solid #334155; border-radius: 8px;
+      padding: 16px; flex: 1; text-align: center;
+    }
+    .stat-card .number { font-size: 28px; font-weight: 700; color: #38bdf8; }
+    .stat-card .stat-label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+
+    .empty-state { text-align: center; padding: 32px 20px; color: #64748b; font-size: 14px; }
+    .loading { text-align: center; padding: 24px; color: #64748b; }
+
+    .info-note {
+      font-size: 12px; color: #64748b; margin-top: 8px; font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Parade State App</h1>
+  <span class="badge">LIVE</span>
+</header>
+
+<nav>
+  <button class="active" data-tab="parade">Parade State</button>
+  <button data-tab="recruits">Recruits</button>
+  <button data-tab="statuses">Statuses</button>
+</nav>
+
+<main>
+
+  <!-- =================== PARADE STATE TAB =================== -->
+  <div id="tab-parade" class="tab active">
+
+    <div class="card">
+      <!-- Date row -->
+      <div class="controls-row">
+        <label for="paradeDate">Date:</label>
+        <input type="date" id="paradeDate">
+      </div>
+
+      <!-- Platoon selector -->
+      <div class="platoon-selector" style="margin-bottom:16px;">
+        <label>Platoons:</label>
+        <div id="platoonCheckboxes" class="platoon-checkboxes">
+          <span style="color:#64748b;font-size:13px;">Loading...</span>
+        </div>
+        <button class="btn btn-secondary" id="btnSelectAll" onclick="selectAllPlatoons()" style="font-size:12px;padding:4px 10px;">All</button>
+        <button class="btn btn-secondary" onclick="clearAllPlatoons()" style="font-size:12px;padding:4px 10px;">Clear</button>
+      </div>
+
+      <button class="btn btn-primary" onclick="loadParadeState()">Generate Parade State</button>
+    </div>
+
+    <!-- Stats -->
+    <div id="paradeStats" class="stats-row" style="display:none;"></div>
+
+    <!-- Output -->
+    <div class="card" id="paradeOutputCard" style="display:none;">
+      <div class="card-header">
+        <h2>Formatted Parade State</h2>
+        <div class="actions">
+          <button class="btn btn-secondary" onclick="copyParadeState()">Copy Text</button>
+        </div>
+      </div>
+      <div id="paradeOutput" class="parade-output"></div>
+    </div>
+  </div>
+
+  <!-- =================== RECRUITS TAB =================== -->
+  <div id="tab-recruits" class="tab">
+    <div class="card">
+      <h2>Add Recruit</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="recruitId">Recruit ID (4 digits, format PSBB)</label>
+          <input type="text" id="recruitId" placeholder="e.g. 1203" maxlength="4">
+        </div>
+        <button class="btn btn-primary" onclick="addRecruit()">Add Recruit</button>
+      </div>
+      <p class="info-note">P = Platoon · S = Section · BB = Bed number (e.g. 1203 = Platoon 1, Section 2, Bed 03)</p>
+    </div>
+
+    <div class="card">
+      <h2>All Recruits</h2>
+      <div id="recruitsTable"><div class="loading">Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- =================== STATUSES TAB =================== -->
+  <div id="tab-statuses" class="tab">
+    <div class="card">
+      <h2>Add Status</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="statusRecruitId">Recruit ID</label>
+          <input type="text" id="statusRecruitId" placeholder="e.g. 1203" maxlength="4">
+        </div>
+        <div class="form-group">
+          <label for="statusType">Type</label>
+          <select id="statusType">
+            <option value="MC">MC</option>
+            <option value="LD">LD</option>
+            <option value="EX">EX</option>
+            <option value="REPORTING_SICK">Reporting Sick (RS)</option>
+            <option value="SEND_OUT_URGENT">Send Out — Urgent</option>
+            <option value="SEND_OUT_NON_URGENT">Send Out — Non-Urgent</option>
+            <option value="OTHERS">Others</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="statusStart">Start Date</label>
+          <input type="date" id="statusStart">
+        </div>
+        <div class="form-group">
+          <label for="statusEnd">End Date</label>
+          <input type="date" id="statusEnd">
+        </div>
+        <div class="form-group">
+          <label for="statusRemark">Remark</label>
+          <input type="text" class="remark" id="statusRemark" placeholder="Optional">
+        </div>
+        <button class="btn btn-primary" onclick="addStatus()">Add</button>
+      </div>
+      <p class="info-note">Status is active from start date through end date (inclusive). It will be auto-removed the following day at midnight UTC.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Active Statuses</h2>
+        <div class="actions">
+          <div class="form-group" style="flex-direction:row;align-items:center;gap:8px;">
+            <label for="activeDate" style="font-size:13px;color:#94a3b8;">Date:</label>
+            <input type="date" id="activeDate">
+          </div>
+          <button class="btn btn-secondary" onclick="loadActiveStatuses()">Refresh</button>
+        </div>
+      </div>
+      <div id="statusesTable"><div class="loading">Loading...</div></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ─── Utilities ───────────────────────────────────────────────────────────────
+
+  function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  async function api(path, options = {}) {
+    const headers = options.body ? { 'Content-Type': 'application/json' } : {};
+    const res = await fetch(path, { headers, ...options });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message || 'Request failed');
+    return data;
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function formatTypeName(type) {
+    const m = {
+      MC: 'MC', LD: 'LD', EX: 'EX',
+      REPORTING_SICK: 'RS',
+      SEND_OUT_URGENT: 'SEND OUT URG',
+      SEND_OUT_NON_URGENT: 'SEND OUT',
+      OTHERS: 'OTHERS',
+    };
+    return m[type] || type;
+  }
+
+  // ─── Tab navigation ──────────────────────────────────────────────────────────
+
+  document.querySelectorAll('nav button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'recruits') loadRecruits();
+      if (btn.dataset.tab === 'statuses') loadActiveStatuses();
+    });
+  });
+
+  // ─── Platoon checkboxes ──────────────────────────────────────────────────────
+
+  let availablePlatoons = [];
+
+  async function loadPlatoons() {
+    try {
+      const res = await api('/parade-state/platoons');
+      availablePlatoons = res.data;
+      renderPlatoonCheckboxes();
+    } catch (err) {
+      document.getElementById('platoonCheckboxes').innerHTML =
+        '<span style="color:#ef4444;font-size:13px;">Failed to load platoons</span>';
+    }
+  }
+
+  function renderPlatoonCheckboxes() {
+    const container = document.getElementById('platoonCheckboxes');
+    if (availablePlatoons.length === 0) {
+      container.innerHTML = '<span style="color:#64748b;font-size:13px;">No platoons found</span>';
+      return;
+    }
+    container.innerHTML = availablePlatoons.map(p => `
+      <label class="platoon-chip selected" id="chip-${p}">
+        <input type="checkbox" value="${p}" checked onchange="togglePlatoonChip(${p}, this)">
+        <span>Platoon ${p}</span>
+      </label>
+    `).join('');
+  }
+
+  function togglePlatoonChip(platoon, checkbox) {
+    const chip = document.getElementById('chip-' + platoon);
+    chip.classList.toggle('selected', checkbox.checked);
+  }
+
+  function getSelectedPlatoons() {
+    return [...document.querySelectorAll('#platoonCheckboxes input[type="checkbox"]:checked')]
+      .map(el => el.value);
+  }
+
+  function selectAllPlatoons() {
+    document.querySelectorAll('#platoonCheckboxes input[type="checkbox"]').forEach(cb => {
+      cb.checked = true;
+      togglePlatoonChip(cb.value, cb);
+    });
+  }
+
+  function clearAllPlatoons() {
+    document.querySelectorAll('#platoonCheckboxes input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+      togglePlatoonChip(cb.value, cb);
+    });
+  }
+
+  // ─── Parade State ────────────────────────────────────────────────────────────
+
+  async function loadParadeState() {
+    const dateVal = document.getElementById('paradeDate').value;
+    const selected = getSelectedPlatoons();
+
+    if (selected.length === 0) {
+      showToast('Select at least one platoon', 'error');
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (dateVal) params.set('date', dateVal);
+    params.set('platoon', selected.join(','));
+
+    try {
+      const res = await api(`/parade-state?${params}`);
+      const { structuredData, formattedText } = res.data;
+
+      // Show output
+      document.getElementById('paradeOutput').textContent = formattedText;
+      document.getElementById('paradeOutputCard').style.display = 'block';
+
+      // Stats
+      let total = 0, inCamp = 0, outOfCamp = 0;
+      for (const p of structuredData.platoons) {
+        total += p.totalStrength;
+        inCamp += p.inCamp;
+        outOfCamp += p.outOfCamp;
+      }
+
+      const statsEl = document.getElementById('paradeStats');
+      statsEl.style.display = 'flex';
+      statsEl.innerHTML = `
+        <div class="stat-card">
+          <div class="number">${total}</div>
+          <div class="stat-label">Total Strength</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="color:#22c55e">${inCamp}</div>
+          <div class="stat-label">In Camp</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" style="color:#ef4444">${outOfCamp}</div>
+          <div class="stat-label">Out of Camp</div>
+        </div>
+        <div class="stat-card">
+          <div class="number">${structuredData.platoons.length}</div>
+          <div class="stat-label">Platoon(s) Selected</div>
+        </div>
+      `;
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  function copyParadeState() {
+    const text = document.getElementById('paradeOutput').textContent;
+    navigator.clipboard.writeText(text)
+      .then(() => showToast('Copied to clipboard!'))
+      .catch(() => showToast('Copy failed', 'error'));
+  }
+
+  // ─── Recruits ────────────────────────────────────────────────────────────────
+
+  async function loadRecruits() {
+    try {
+      const res = await api('/recruits');
+      const recruits = res.data;
+      if (recruits.length === 0) {
+        document.getElementById('recruitsTable').innerHTML = '<div class="empty-state">No recruits yet.</div>';
+        return;
+      }
+      let html = `<table><thead><tr>
+        <th>ID</th><th>Platoon</th><th>Section</th><th>Bed</th><th>Added</th><th></th>
+      </tr></thead><tbody>`;
+      for (const r of recruits) {
+        html += `<tr>
+          <td><strong>${r.id}</strong></td>
+          <td>${r.platoon}</td><td>${r.section}</td><td>${r.bed}</td>
+          <td>${new Date(r.createdAt).toLocaleDateString()}</td>
+          <td><button class="btn btn-danger" onclick="deleteRecruit('${r.id}')">Delete</button></td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+      document.getElementById('recruitsTable').innerHTML = html;
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  async function deleteRecruit(id) {
+    if (!confirm(`Remove recruit ${id}? This will also delete all their status records.`)) return;
+    try {
+      await api(`/recruits/${id}`, { method: 'DELETE' });
+      showToast(`Recruit ${id} removed`);
+      loadRecruits();
+      loadPlatoons();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  async function addRecruit() {
+    const id = document.getElementById('recruitId').value.trim();
+    if (!id) { showToast('Enter a recruit ID', 'error'); return; }
+    try {
+      await api('/recruits', { method: 'POST', body: JSON.stringify({ id }) });
+      showToast(`Recruit ${id} added`);
+      document.getElementById('recruitId').value = '';
+      loadRecruits();
+      loadPlatoons(); // refresh platoon list in case a new platoon was added
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  // ─── Statuses ────────────────────────────────────────────────────────────────
+
+  async function loadActiveStatuses() {
+    const dateVal = document.getElementById('activeDate').value;
+    const query = dateVal ? `?date=${dateVal}` : '';
+    try {
+      const res = await api(`/status/active${query}`);
+      const statuses = res.data;
+      if (statuses.length === 0) {
+        document.getElementById('statusesTable').innerHTML = '<div class="empty-state">No active statuses for this date.</div>';
+        return;
+      }
+      let html = `<table><thead><tr>
+        <th>Recruit</th><th>Type</th><th>Start</th><th>End</th><th>Remark</th><th>Delete</th>
+      </tr></thead><tbody>`;
+      for (const s of statuses) {
+        html += `<tr>
+          <td><strong>${s.recruitId}</strong></td>
+          <td><span class="type-badge type-${s.type}">${formatTypeName(s.type)}</span></td>
+          <td>${formatDate(s.startDate)}</td>
+          <td>${formatDate(s.endDate)}</td>
+          <td>${s.remark || '—'}</td>
+          <td><button class="btn btn-danger" onclick="deleteStatus('${s.id}')">Delete</button></td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+      document.getElementById('statusesTable').innerHTML = html;
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  async function addStatus() {
+    const recruitId = document.getElementById('statusRecruitId').value.trim();
+    const type     = document.getElementById('statusType').value;
+    const startDate = document.getElementById('statusStart').value;
+    const endDate   = document.getElementById('statusEnd').value;
+    const remark   = document.getElementById('statusRemark').value.trim();
+
+    if (!recruitId || !startDate || !endDate) {
+      showToast('Recruit ID, start date, and end date are required', 'error');
+      return;
+    }
+    try {
+      await api('/status', {
+        method: 'POST',
+        body: JSON.stringify({ recruitId, type, startDate, endDate, remark: remark || undefined }),
+      });
+      showToast(`Status added for ${recruitId}`);
+      document.getElementById('statusRecruitId').value = '';
+      document.getElementById('statusRemark').value = '';
+      loadActiveStatuses();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  async function deleteStatus(id) {
+    if (!confirm('Delete this status record?')) return;
+    try {
+      await api(`/status/${id}`, { method: 'DELETE' });
+      showToast('Status deleted');
+      loadActiveStatuses();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  // ─── Init ────────────────────────────────────────────────────────────────────
+
+  // Set default dates to today
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('paradeDate').value = today;
+  document.getElementById('statusStart').value = today;
+  document.getElementById('statusEnd').value = today;
+  document.getElementById('activeDate').value = today;
+
+  // Enter key on recruit ID field
+  document.getElementById('recruitId').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addRecruit();
+  });
+
+  // Load platoon list on page load
+  loadPlatoons();
+</script>
+
+</body>
+</html>
