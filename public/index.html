@@ -117,6 +117,7 @@
     .type-MC { background: #7f1d1d; color: #fca5a5; }
     .type-LD { background: #713f12; color: #fde047; }
     .type-EX { background: #14532d; color: #86efac; }
+    .type-EX_STAY_IN { background: #14532d; color: #86efac; }
     .type-REPORTING_SICK { background: #312e81; color: #a5b4fc; }
     .type-OTHERS, .type-SEND_OUT_URGENT, .type-SEND_OUT_NON_URGENT { background: #334155; color: #94a3b8; }
 
@@ -232,13 +233,14 @@
         <div class="form-group">
           <label for="statusType">Type</label>
           <select id="statusType">
-            <option value="MC">MC</option>
-            <option value="LD">LD</option>
-            <option value="EX">EX</option>
-            <option value="REPORTING_SICK">Reporting Sick (RS)</option>
-            <option value="SEND_OUT_URGENT">Send Out — Urgent</option>
-            <option value="SEND_OUT_NON_URGENT">Send Out — Non-Urgent</option>
-            <option value="OTHERS">Others</option>
+          <option value="MC">MC</option>
+          <option value="LD">LD</option>
+          <option value="EX">EX</option>
+          <option value="EX_STAY_IN">EX STAY IN</option>
+          <option value="REPORTING_SICK">Reporting Sick (RS)</option>
+          <option value="SEND_OUT_URGENT">Send Out — Urgent</option>
+          <option value="SEND_OUT_NON_URGENT">Send Out — Non-Urgent</option>
+          <option value="OTHERS">Others</option>
           </select>
         </div>
         <div class="form-group">
@@ -300,14 +302,17 @@
   }
 
   function formatTypeName(type) {
-    const m = {
-      MC: 'MC', LD: 'LD', EX: 'EX',
-      REPORTING_SICK: 'RS',
-      SEND_OUT_URGENT: 'SEND OUT URG',
-      SEND_OUT_NON_URGENT: 'SEND OUT',
-      OTHERS: 'OTHERS',
-    };
-    return m[type] || type;
+  const m = {
+    MC: 'MC',
+    LD: 'LD',
+    EX: 'EX',
+    EX_STAY_IN: 'EX STAY IN',
+    REPORTING_SICK: 'RS',
+    SEND_OUT_URGENT: 'SEND OUT URG',
+    SEND_OUT_NON_URGENT: 'SEND OUT',
+    OTHERS: 'OTHERS',
+  };
+  return m[type] || type;
   }
 
   // ─── Tab navigation ──────────────────────────────────────────────────────────

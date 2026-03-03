@@ -119,6 +119,13 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
             break;
           }
 
+          case 'EX_STAY_IN': {
+            exStayIn.push(entry); 
+            inCampStatusRecruitIds.add(recruit.id); 
+            break;
+          }
+  
+
           case 'REPORTING_SICK':
             rsList.push(entry);
             inCampStatusRecruitIds.add(recruit.id);
