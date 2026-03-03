@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma.js';
-import { normalizeToDate } from '../utils/dateUtils.js';
+import { normalizeToSGTDate, isExStayInInCamp } from '../utils/dateUtils.js';
 import type { StatusRecord, Recruit, StatusEntry, PlatoonParadeState, ParadeStateResult } from '../types/index.js';
 
 /** Determine if a status record means the recruit is out of camp */
@@ -10,7 +10,11 @@ function isOutOfCamp(status: StatusRecord): boolean {
     case 'SEND_OUT_NON_URGENT':
       return true;
     case 'EX':
-      return status.remark.toUpperCase().includes('STAY OUT');
+      return false;  // always in camp
+    case 'EX_STAY_IN':
+      return !isExStayInInCamp();
+    case 'OTHERS':
+      return status.outOfCamp;
     default:
       return false;
   }
@@ -27,7 +31,7 @@ export async function getAvailablePlatoons(): Promise<number[]> {
 }
 
 export async function generateParadeState(date?: Date, platoonFilter?: number[]): Promise<ParadeStateResult> {
-  const targetDate = date ?? normalizeToDate(new Date());
+  const targetDate = date ?? normalizeToSGTDate(new Date());
 
   // Fetch recruits, optionally filtered by platoon numbers
   const recruits = await prisma.recruit.findMany({
@@ -61,6 +65,8 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
     platoonMap.set(recruit.platoon, list);
   }
 
+  const exStayInInCamp = isExStayInInCamp();
+
   // Build per-platoon parade state
   const platoons: PlatoonParadeState[] = [];
 
@@ -75,9 +81,9 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
     const mcList: StatusEntry[] = [];
     const ldList: StatusEntry[] = [];
     const exList: StatusEntry[] = [];
+    let exInCampCount = 0;
     const rsList: StatusEntry[] = [];
     const othersList: StatusEntry[] = [];
-    let totalExCount = 0;
 
     const inCampStatusRecruitIds = new Set<string>();
 
@@ -105,37 +111,38 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
 
           case 'LD':
             ldList.push(entry);
-            inCampStatusRecruitIds.add(recruit.id);
-            break;
-
-          case 'EX': {
-            totalExCount++;
-            const isStayOut = s.remark.toUpperCase().includes('STAY OUT');
-            if (!isStayOut) {
-              exStayIn.push(entry);
+            if (!recruitOutOfCamp) {
+              inCampStatusRecruitIds.add(recruit.id);
             }
-            exList.push(entry);
-            inCampStatusRecruitIds.add(recruit.id);
             break;
-          }
 
-          case 'EX_STAY_IN': {
-            exStayIn.push(entry); 
-            inCampStatusRecruitIds.add(recruit.id); 
+          case 'EX':
+            exList.push(entry);
+            if (!recruitOutOfCamp) {
+              inCampStatusRecruitIds.add(recruit.id);
+              exInCampCount++;
+            }
             break;
-          }
-  
+
+          case 'EX_STAY_IN':
+            exStayIn.push(entry);
+            if (exStayInInCamp && !recruitOutOfCamp) {
+              inCampStatusRecruitIds.add(recruit.id);
+            }
+            break;
 
           case 'REPORTING_SICK':
             rsList.push(entry);
-            inCampStatusRecruitIds.add(recruit.id);
+            if (!recruitOutOfCamp) {
+              inCampStatusRecruitIds.add(recruit.id);
+            }
             break;
 
           case 'SEND_OUT_URGENT':
           case 'SEND_OUT_NON_URGENT':
           case 'OTHERS':
             othersList.push(entry);
-            if (!isOutOfCamp(s)) {
+            if (!isOutOfCamp(s) && !recruitOutOfCamp) {
               inCampStatusRecruitIds.add(recruit.id);
             }
             break;
@@ -157,11 +164,12 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
       inCamp: totalStrength - outOfCamp,
       outOfCamp,
       exStayIn,
-      totalExCount,
+      exStayInInCamp,
       mcList,
       statusUniqueCount: inCampStatusRecruitIds.size,
       ldList,
       exList,
+      exInCampCount,
       rsList,
       othersList,
     });

@@ -66,7 +66,8 @@ function formatPlatoonBlock(ps: PlatoonParadeState): string {
   lines.push('');
 
   // EX STAY IN
-  lines.push(`EX STAY IN: ${zeroPad(ps.exStayIn.length)}/${zeroPad(ps.totalExCount)}`);
+  const exStayInInCampCount = ps.exStayInInCamp ? ps.exStayIn.length : 0;
+  lines.push(`EX STAY IN: ${zeroPad(exStayInInCampCount)}/${zeroPad(ps.exStayIn.length)}`);
   for (const entry of ps.exStayIn) {
     lines.push(formatExStayInLine(entry));
   }
@@ -84,14 +85,14 @@ function formatPlatoonBlock(ps: PlatoonParadeState): string {
   lines.push('');
 
   // LD
-  lines.push(`LD: ${zeroPad(ps.ldList.length)}`);
+  lines.push(`LD: ${zeroPad(ps.ldList.length)}/${zeroPad(ps.ldList.length)}`);
   for (const entry of ps.ldList) {
     lines.push(formatLdLine(entry));
   }
   lines.push('');
 
   // EX (full detail)
-  lines.push(`EX: ${zeroPad(ps.exList.length)}`);
+  lines.push(`EX: ${zeroPad(ps.exInCampCount)}/${zeroPad(ps.exList.length)}`);
   for (const entry of ps.exList) {
     lines.push(formatExLine(entry));
   }

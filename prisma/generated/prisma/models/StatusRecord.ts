@@ -31,6 +31,7 @@ export type StatusRecordMinAggregateOutputType = {
   startDate: Date | null
   endDate: Date | null
   remark: string | null
+  outOfCamp: boolean | null
   createdAt: Date | null
 }
 
@@ -41,6 +42,7 @@ export type StatusRecordMaxAggregateOutputType = {
   startDate: Date | null
   endDate: Date | null
   remark: string | null
+  outOfCamp: boolean | null
   createdAt: Date | null
 }
 
@@ -51,6 +53,7 @@ export type StatusRecordCountAggregateOutputType = {
   startDate: number
   endDate: number
   remark: number
+  outOfCamp: number
   createdAt: number
   _all: number
 }
@@ -63,6 +66,7 @@ export type StatusRecordMinAggregateInputType = {
   startDate?: true
   endDate?: true
   remark?: true
+  outOfCamp?: true
   createdAt?: true
 }
 
@@ -73,6 +77,7 @@ export type StatusRecordMaxAggregateInputType = {
   startDate?: true
   endDate?: true
   remark?: true
+  outOfCamp?: true
   createdAt?: true
 }
 
@@ -83,6 +88,7 @@ export type StatusRecordCountAggregateInputType = {
   startDate?: true
   endDate?: true
   remark?: true
+  outOfCamp?: true
   createdAt?: true
   _all?: true
 }
@@ -166,6 +172,7 @@ export type StatusRecordGroupByOutputType = {
   startDate: Date
   endDate: Date
   remark: string
+  outOfCamp: boolean
   createdAt: Date
   _count: StatusRecordCountAggregateOutputType | null
   _min: StatusRecordMinAggregateOutputType | null
@@ -197,6 +204,7 @@ export type StatusRecordWhereInput = {
   startDate?: Prisma.DateTimeFilter<"StatusRecord"> | Date | string
   endDate?: Prisma.DateTimeFilter<"StatusRecord"> | Date | string
   remark?: Prisma.StringFilter<"StatusRecord"> | string
+  outOfCamp?: Prisma.BoolFilter<"StatusRecord"> | boolean
   createdAt?: Prisma.DateTimeFilter<"StatusRecord"> | Date | string
   recruit?: Prisma.XOR<Prisma.RecruitScalarRelationFilter, Prisma.RecruitWhereInput>
 }
@@ -208,6 +216,7 @@ export type StatusRecordOrderByWithRelationInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   remark?: Prisma.SortOrder
+  outOfCamp?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   recruit?: Prisma.RecruitOrderByWithRelationInput
 }
@@ -222,6 +231,7 @@ export type StatusRecordWhereUniqueInput = Prisma.AtLeast<{
   startDate?: Prisma.DateTimeFilter<"StatusRecord"> | Date | string
   endDate?: Prisma.DateTimeFilter<"StatusRecord"> | Date | string
   remark?: Prisma.StringFilter<"StatusRecord"> | string
+  outOfCamp?: Prisma.BoolFilter<"StatusRecord"> | boolean
   createdAt?: Prisma.DateTimeFilter<"StatusRecord"> | Date | string
   recruit?: Prisma.XOR<Prisma.RecruitScalarRelationFilter, Prisma.RecruitWhereInput>
 }, "id">
@@ -233,6 +243,7 @@ export type StatusRecordOrderByWithAggregationInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   remark?: Prisma.SortOrder
+  outOfCamp?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.StatusRecordCountOrderByAggregateInput
   _max?: Prisma.StatusRecordMaxOrderByAggregateInput
@@ -249,6 +260,7 @@ export type StatusRecordScalarWhereWithAggregatesInput = {
   startDate?: Prisma.DateTimeWithAggregatesFilter<"StatusRecord"> | Date | string
   endDate?: Prisma.DateTimeWithAggregatesFilter<"StatusRecord"> | Date | string
   remark?: Prisma.StringWithAggregatesFilter<"StatusRecord"> | string
+  outOfCamp?: Prisma.BoolWithAggregatesFilter<"StatusRecord"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StatusRecord"> | Date | string
 }
 
@@ -258,6 +270,7 @@ export type StatusRecordCreateInput = {
   startDate: Date | string
   endDate: Date | string
   remark?: string
+  outOfCamp?: boolean
   createdAt?: Date | string
   recruit: Prisma.RecruitCreateNestedOneWithoutStatusesInput
 }
@@ -269,6 +282,7 @@ export type StatusRecordUncheckedCreateInput = {
   startDate: Date | string
   endDate: Date | string
   remark?: string
+  outOfCamp?: boolean
   createdAt?: Date | string
 }
 
@@ -278,6 +292,7 @@ export type StatusRecordUpdateInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remark?: Prisma.StringFieldUpdateOperationsInput | string
+  outOfCamp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recruit?: Prisma.RecruitUpdateOneRequiredWithoutStatusesNestedInput
 }
@@ -289,6 +304,7 @@ export type StatusRecordUncheckedUpdateInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remark?: Prisma.StringFieldUpdateOperationsInput | string
+  outOfCamp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -299,6 +315,7 @@ export type StatusRecordCreateManyInput = {
   startDate: Date | string
   endDate: Date | string
   remark?: string
+  outOfCamp?: boolean
   createdAt?: Date | string
 }
 
@@ -308,6 +325,7 @@ export type StatusRecordUpdateManyMutationInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remark?: Prisma.StringFieldUpdateOperationsInput | string
+  outOfCamp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -318,6 +336,7 @@ export type StatusRecordUncheckedUpdateManyInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remark?: Prisma.StringFieldUpdateOperationsInput | string
+  outOfCamp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -338,6 +357,7 @@ export type StatusRecordCountOrderByAggregateInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   remark?: Prisma.SortOrder
+  outOfCamp?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -348,6 +368,7 @@ export type StatusRecordMaxOrderByAggregateInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   remark?: Prisma.SortOrder
+  outOfCamp?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -358,6 +379,7 @@ export type StatusRecordMinOrderByAggregateInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   remark?: Prisma.SortOrder
+  outOfCamp?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -407,12 +429,17 @@ export type EnumStatusTypeFieldUpdateOperationsInput = {
   set?: $Enums.StatusType
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type StatusRecordCreateWithoutRecruitInput = {
   id?: string
   type: $Enums.StatusType
   startDate: Date | string
   endDate: Date | string
   remark?: string
+  outOfCamp?: boolean
   createdAt?: Date | string
 }
 
@@ -422,6 +449,7 @@ export type StatusRecordUncheckedCreateWithoutRecruitInput = {
   startDate: Date | string
   endDate: Date | string
   remark?: string
+  outOfCamp?: boolean
   createdAt?: Date | string
 }
 
@@ -460,6 +488,7 @@ export type StatusRecordScalarWhereInput = {
   startDate?: Prisma.DateTimeFilter<"StatusRecord"> | Date | string
   endDate?: Prisma.DateTimeFilter<"StatusRecord"> | Date | string
   remark?: Prisma.StringFilter<"StatusRecord"> | string
+  outOfCamp?: Prisma.BoolFilter<"StatusRecord"> | boolean
   createdAt?: Prisma.DateTimeFilter<"StatusRecord"> | Date | string
 }
 
@@ -469,6 +498,7 @@ export type StatusRecordCreateManyRecruitInput = {
   startDate: Date | string
   endDate: Date | string
   remark?: string
+  outOfCamp?: boolean
   createdAt?: Date | string
 }
 
@@ -478,6 +508,7 @@ export type StatusRecordUpdateWithoutRecruitInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remark?: Prisma.StringFieldUpdateOperationsInput | string
+  outOfCamp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -487,6 +518,7 @@ export type StatusRecordUncheckedUpdateWithoutRecruitInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remark?: Prisma.StringFieldUpdateOperationsInput | string
+  outOfCamp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -496,6 +528,7 @@ export type StatusRecordUncheckedUpdateManyWithoutRecruitInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   remark?: Prisma.StringFieldUpdateOperationsInput | string
+  outOfCamp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -508,6 +541,7 @@ export type StatusRecordSelect<ExtArgs extends runtime.Types.Extensions.Internal
   startDate?: boolean
   endDate?: boolean
   remark?: boolean
+  outOfCamp?: boolean
   createdAt?: boolean
   recruit?: boolean | Prisma.RecruitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["statusRecord"]>
@@ -519,6 +553,7 @@ export type StatusRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   startDate?: boolean
   endDate?: boolean
   remark?: boolean
+  outOfCamp?: boolean
   createdAt?: boolean
   recruit?: boolean | Prisma.RecruitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["statusRecord"]>
@@ -530,6 +565,7 @@ export type StatusRecordSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   startDate?: boolean
   endDate?: boolean
   remark?: boolean
+  outOfCamp?: boolean
   createdAt?: boolean
   recruit?: boolean | Prisma.RecruitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["statusRecord"]>
@@ -541,10 +577,11 @@ export type StatusRecordSelectScalar = {
   startDate?: boolean
   endDate?: boolean
   remark?: boolean
+  outOfCamp?: boolean
   createdAt?: boolean
 }
 
-export type StatusRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recruitId" | "type" | "startDate" | "endDate" | "remark" | "createdAt", ExtArgs["result"]["statusRecord"]>
+export type StatusRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "recruitId" | "type" | "startDate" | "endDate" | "remark" | "outOfCamp" | "createdAt", ExtArgs["result"]["statusRecord"]>
 export type StatusRecordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recruit?: boolean | Prisma.RecruitDefaultArgs<ExtArgs>
 }
@@ -567,6 +604,7 @@ export type $StatusRecordPayload<ExtArgs extends runtime.Types.Extensions.Intern
     startDate: Date
     endDate: Date
     remark: string
+    outOfCamp: boolean
     createdAt: Date
   }, ExtArgs["result"]["statusRecord"]>
   composites: {}
@@ -998,6 +1036,7 @@ export interface StatusRecordFieldRefs {
   readonly startDate: Prisma.FieldRef<"StatusRecord", 'DateTime'>
   readonly endDate: Prisma.FieldRef<"StatusRecord", 'DateTime'>
   readonly remark: Prisma.FieldRef<"StatusRecord", 'String'>
+  readonly outOfCamp: Prisma.FieldRef<"StatusRecord", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"StatusRecord", 'DateTime'>
 }
     

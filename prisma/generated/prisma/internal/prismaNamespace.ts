@@ -607,6 +607,7 @@ export const StatusRecordScalarFieldEnum = {
   startDate: 'startDate',
   endDate: 'endDate',
   remark: 'remark',
+  outOfCamp: 'outOfCamp',
   createdAt: 'createdAt'
 } as const
 
@@ -652,6 +653,13 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'StatusType'
  */
 export type EnumStatusTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusType'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

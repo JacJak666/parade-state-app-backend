@@ -1,7 +1,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { generateParadeState, getAvailablePlatoons } from '../services/paradeStateService.js';
 import { formatParadeState } from '../services/formatService.js';
-import { normalizeToDate } from '../utils/dateUtils.js';
+import { normalizeToSGTDate } from '../utils/dateUtils.js';
 
 const paradeStateRoutes: FastifyPluginAsync = async (fastify) => {
   // GET /parade-state/platoons — returns the list of platoon numbers that exist
@@ -12,7 +12,7 @@ const paradeStateRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /parade-state?date=YYYY-MM-DD&platoon=1,2,3
   fastify.get<{ Querystring: { date?: string; platoon?: string } }>('/parade-state', async (request) => {
-    const date = request.query.date ? normalizeToDate(request.query.date) : undefined;
+    const date = request.query.date ? normalizeToSGTDate(request.query.date) : undefined;
 
     // Parse comma-separated platoon numbers, e.g. "1,3" → [1, 3]
     const platoonFilter = request.query.platoon

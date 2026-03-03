@@ -1,7 +1,11 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const SGT = 'Asia/Singapore';
 
 /** Calculate duration in days (inclusive): differenceInDays(end, start) + 1 */
 export function calculateDuration(start: Date, end: Date): number {
@@ -32,6 +36,17 @@ export function isDateInRange(date: Date, start: Date, end: Date): boolean {
 /** Normalize a date string (YYYY-MM-DD) or Date to midnight UTC */
 export function normalizeToDate(input: string | Date): Date {
   return dayjs.utc(input).startOf('day').toDate();
+}
+
+/** Normalize a date string (YYYY-MM-DD) or Date to midnight SGT, returned as a UTC Date */
+export function normalizeToSGTDate(input: string | Date): Date {
+  return dayjs.tz(input, SGT).startOf('day').toDate();
+}
+
+/** True if the current SGT wall-clock time is within the EX_STAY_IN book-in window (0800–2000) */
+export function isExStayInInCamp(): boolean {
+  const sgtHour = dayjs().tz(SGT).hour();
+  return sgtHour >= 8 && sgtHour < 20;
 }
 
 /** Zero-pad a number to 2 digits */

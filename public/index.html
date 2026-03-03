@@ -251,13 +251,20 @@
           <label for="statusEnd">End Date</label>
           <input type="date" id="statusEnd">
         </div>
+        <div class="form-group" id="outOfCampGroup" style="display:none;">
+          <label for="statusOutOfCamp">In/Out of Camp</label>
+          <select id="statusOutOfCamp">
+            <option value="false">In Camp</option>
+            <option value="true">Out of Camp</option>
+          </select>
+        </div>
         <div class="form-group">
           <label for="statusRemark">Remark</label>
           <input type="text" class="remark" id="statusRemark" placeholder="Optional">
         </div>
         <button class="btn btn-primary" onclick="addStatus()">Add</button>
       </div>
-      <p class="info-note">Status is active from start date through end date (inclusive). It will be auto-removed the following day at midnight UTC.</p>
+      <p class="info-note">Status is active from start date through end date (inclusive). It will be auto-removed the following day at midnight SGT.</p>
     </div>
 
     <div class="card">
@@ -301,18 +308,19 @@
     return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
-  function formatTypeName(type) {
-  const m = {
-    MC: 'MC',
-    LD: 'LD',
-    EX: 'EX',
-    EX_STAY_IN: 'EX STAY IN',
-    REPORTING_SICK: 'RS',
-    SEND_OUT_URGENT: 'SEND OUT URG',
-    SEND_OUT_NON_URGENT: 'SEND OUT',
-    OTHERS: 'OTHERS',
-  };
-  return m[type] || type;
+  function formatTypeName(type, outOfCamp) {
+    const m = {
+      MC: 'MC',
+      LD: 'LD',
+      EX: 'EX',
+      EX_STAY_IN: 'EX STAY IN',
+      REPORTING_SICK: 'RS',
+      SEND_OUT_URGENT: 'SEND OUT URG',
+      SEND_OUT_NON_URGENT: 'SEND OUT',
+      OTHERS: 'OTHERS',
+    };
+    if (type === 'OTHERS') return `OTHERS (${outOfCamp ? 'Out' : 'In Camp'})`;
+    return m[type] || type;
   }
 
   // ─── Tab navigation ──────────────────────────────────────────────────────────
@@ -516,7 +524,7 @@
       for (const s of statuses) {
         html += `<tr>
           <td><strong>${s.recruitId}</strong></td>
-          <td><span class="type-badge type-${s.type}">${formatTypeName(s.type)}</span></td>
+          <td><span class="type-badge type-${s.type}">${formatTypeName(s.type, s.outOfCamp)}</span></td>
           <td>${formatDate(s.startDate)}</td>
           <td>${formatDate(s.endDate)}</td>
           <td>${s.remark || '—'}</td>
@@ -530,12 +538,19 @@
     }
   }
 
+  document.getElementById('statusType').addEventListener('change', function () {
+    document.getElementById('outOfCampGroup').style.display = this.value === 'OTHERS' ? '' : 'none';
+  });
+
   async function addStatus() {
     const recruitId = document.getElementById('statusRecruitId').value.trim();
     const type     = document.getElementById('statusType').value;
     const startDate = document.getElementById('statusStart').value;
     const endDate   = document.getElementById('statusEnd').value;
     const remark   = document.getElementById('statusRemark').value.trim();
+    const outOfCamp = type === 'OTHERS'
+      ? document.getElementById('statusOutOfCamp').value === 'true'
+      : undefined;
 
     if (!recruitId || !startDate || !endDate) {
       showToast('Recruit ID, start date, and end date are required', 'error');
@@ -544,7 +559,7 @@
     try {
       await api('/status', {
         method: 'POST',
-        body: JSON.stringify({ recruitId, type, startDate, endDate, remark: remark || undefined }),
+        body: JSON.stringify({ recruitId, type, startDate, endDate, remark: remark || undefined, outOfCamp }),
       });
       showToast(`Status added for ${recruitId}`);
       document.getElementById('statusRecruitId').value = '';

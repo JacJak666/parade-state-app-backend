@@ -86,6 +86,7 @@ export const StatusRecordScalarFieldEnum = {
   startDate: 'startDate',
   endDate: 'endDate',
   remark: 'remark',
+  outOfCamp: 'outOfCamp',
   createdAt: 'createdAt'
 } as const
 

@@ -49,8 +49,9 @@ HTTP Request
 
 `parseRecruitId()` in `src/utils/recruitId.ts` derives platoon/section/bed from the ID.
 
-**StatusType enum**: `MC | LD | EX | SEND_OUT_URGENT | SEND_OUT_NON_URGENT | REPORTING_SICK | OTHERS`
+**StatusType enum**: `MC | LD | EX | EX_STAY_IN | SEND_OUT_URGENT | SEND_OUT_NON_URGENT | REPORTING_SICK | OTHERS`
 - `RIB` was intentionally removed — do not add it back.
+- `EX_STAY_IN` is a first-class type (not derived from EX remark). Do not infer it from remarks.
 
 ### Out-of-Camp Rules (in `paradeStateService.ts`)
 
@@ -59,8 +60,12 @@ HTTP Request
 | MC | Always |
 | SEND_OUT_URGENT | Always |
 | SEND_OUT_NON_URGENT | Always |
-| EX | Only if remark contains "STAY OUT" (case-insensitive) |
+| EX | No (always in-camp) |
+| EX_STAY_IN | Outside 0800–2000 SGT (books in 0800, books out 2000 daily) |
+| OTHERS | Determined by `outOfCamp` field on the record (user-selectable at creation) |
 | All others | No (in-camp) |
+
+In/out for `EX_STAY_IN` is determined by the **current real-time SGT clock** via `isExStayInInCamp()` in `src/utils/dateUtils.ts`, regardless of the queried date.
 
 ### Parade State Output Format
 
@@ -70,7 +75,7 @@ HTTP Request
 Platoon X: {inCamp}/{totalStrength}     ← zero-padded to 2 digits
 Out of Camp: {count}
 
-EX STAY IN: {stayInCount}/{totalExCount}
+EX STAY IN: {inCampCount}/{totalExStayInCount}  ← 0 or total depending on SGT time
 {id} ({DDMMYY}-{DDMMYY})
 
 MC: {count}
@@ -86,11 +91,11 @@ OTHERS: {count}                         ← includes SEND_OUT_* types
 
 - Dates in `DDMMYY` format (e.g., `180226` = 18 Feb 2026)
 - Duration `{N}D` = `differenceInDays(end, start) + 1`
-- endDate is **inclusive** — a status with endDate 18 Feb is active on 18 Feb and auto-deleted at 19 Feb 0000 UTC
+- endDate is **inclusive** — a status with endDate 18 Feb is active on 18 Feb and auto-deleted at 19 Feb 0000 SGT
 
 ### Auto-Delete
 
-`deleteExpiredStatuses()` in `src/services/statusService.ts` deletes records where `endDate < today midnight UTC`. It runs on server startup and daily at midnight UTC via `scheduleDailyMidnightUTC()` in `src/server.ts`.
+`deleteExpiredStatuses()` in `src/services/statusService.ts` deletes records where `endDate < today midnight SGT`. It runs on server startup and daily at midnight SGT via `scheduleDailyMidnightSGT()` in `src/server.ts`.
 
 ### Frontend
 

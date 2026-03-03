@@ -12,6 +12,7 @@ export interface CreateStatusInput {
   startDate: string; // ISO date string "YYYY-MM-DD"
   endDate: string;   // ISO date string "YYYY-MM-DD"
   remark?: string;
+  outOfCamp?: boolean; // only meaningful for OTHERS type
 }
 
 export interface ParsedRecruitId {
@@ -36,11 +37,12 @@ export interface PlatoonParadeState {
   inCamp: number;
   outOfCamp: number;
   exStayIn: StatusEntry[];
-  totalExCount: number;
+  exStayInInCamp: boolean;   // true if current SGT time is 0800–2000
   mcList: StatusEntry[];
   statusUniqueCount: number; // unique recruits with in-camp statuses
   ldList: StatusEntry[];
   exList: StatusEntry[];     // all EX entries with full detail
+  exInCampCount: number;     // EX entries whose recruit is not overridden out-of-camp
   rsList: StatusEntry[];
   othersList: StatusEntry[];
 }

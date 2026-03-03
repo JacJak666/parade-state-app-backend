@@ -1,12 +1,12 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { addStatus, getActiveStatuses, deleteStatus } from '../services/statusService.js';
-import { normalizeToDate } from '../utils/dateUtils.js';
+import { normalizeToSGTDate } from '../utils/dateUtils.js';
 import type { CreateStatusInput } from '../types/index.js';
 
 const statusRoutes: FastifyPluginAsync = async (fastify) => {
   // POST /status
   fastify.post<{ Body: CreateStatusInput }>('/status', async (request, reply) => {
-    const { recruitId, type, startDate, endDate, remark } = request.body ?? {} as any;
+    const { recruitId, type, startDate, endDate, remark, outOfCamp } = request.body ?? {} as any;
 
     if (!recruitId || !type || !startDate || !endDate) {
       return reply.code(400).send({
@@ -16,7 +16,7 @@ const statusRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     try {
-      const status = await addStatus({ recruitId, type, startDate, endDate, remark });
+      const status = await addStatus({ recruitId, type, startDate, endDate, remark, outOfCamp });
       return reply.code(201).send({ success: true, data: status });
     } catch (err: any) {
       if (err.message.includes('not found')) {
@@ -34,7 +34,7 @@ const statusRoutes: FastifyPluginAsync = async (fastify) => {
 
   // GET /status/active
   fastify.get<{ Querystring: { date?: string } }>('/status/active', async (request) => {
-    const date = request.query.date ? normalizeToDate(request.query.date) : undefined;
+    const date = request.query.date ? normalizeToSGTDate(request.query.date) : undefined;
     const statuses = await getActiveStatuses(date);
     return { success: true, data: statuses };
   });

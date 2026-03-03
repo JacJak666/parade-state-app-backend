@@ -20,6 +20,7 @@ enum StatusType {
   MC
   LD
   EX
+  EX_STAY_IN
   SEND_OUT_URGENT
   SEND_OUT_NON_URGENT
   REPORTING_SICK
@@ -27,13 +28,14 @@ enum StatusType {
 }
 
 model StatusRecord {
-  id        String     @id @default(uuid())
-  recruitId String
-  type      StatusType
-  startDate DateTime
-  endDate   DateTime
-  remark    String     @default("")
-  createdAt DateTime   @default(now())
+  id         String     @id @default(uuid())
+  recruitId  String
+  type       StatusType
+  startDate  DateTime
+  endDate    DateTime
+  remark     String     @default("")
+  outOfCamp  Boolean    @default(false)
+  createdAt  DateTime   @default(now())
 
   recruit Recruit @relation(fields: [recruitId], references: [id], onDelete: Cascade)
 
