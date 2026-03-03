@@ -81,18 +81,18 @@ function formatPlatoonBlock(ps: PlatoonParadeState): string {
   lines.push('');
 
   // Status divider
-  lines.push(`Status: ${zeroPad(ps.ldInCampCount + ps.exInCampCount)}/${zeroPad(ps.ldList.length + ps.exList.length)}`);
+  lines.push(`Status: ${zeroPad(ps.ldInCampCount + ps.exInCampCount)}/${zeroPad(ps.ldTotalCount + ps.exTotalCount)}`);
   lines.push('');
 
   // LD
-  lines.push(`LD: ${zeroPad(ps.ldInCampCount)}/${zeroPad(ps.ldList.length)}`);
+  lines.push(`LD: ${zeroPad(ps.ldInCampCount)}/${zeroPad(ps.ldTotalCount)}`);
   for (const entry of ps.ldList) {
     lines.push(formatLdLine(entry));
   }
   lines.push('');
 
   // EX (full detail)
-  lines.push(`EX: ${zeroPad(ps.exInCampCount)}/${zeroPad(ps.exList.length)}`);
+  lines.push(`EX: ${zeroPad(ps.exInCampCount)}/${zeroPad(ps.exTotalCount)}`);
   for (const entry of ps.exList) {
     lines.push(formatExLine(entry));
   }

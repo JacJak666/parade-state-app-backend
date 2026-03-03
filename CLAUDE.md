@@ -65,7 +65,9 @@ HTTP Request
 | OTHERS | Determined by `outOfCamp` field on the record (user-selectable at creation) |
 | All others | No (in-camp) |
 
-In/out for `EX_STAY_IN` depends on the queried date: if querying **today**, it uses the real-time SGT clock via `isExStayInInCamp()`; if querying any **other date** (historical or future), EX_STAY_IN is always treated as in-camp (deterministic).
+In/out for `EX_STAY_IN` is determined as follows:
+- If `?time=HHMM` is provided: use that time for any date (fully deterministic).
+- If no `time` param: today uses the live SGT clock via `isExStayInInCamp()`; any other date (historical or future) defaults to in-camp.
 
 ### Parade State Output Format
 
@@ -112,4 +114,4 @@ Single-page `public/index.html` served by `@fastify/static`. Three tabs: Parade 
 | GET | `/status/active?date=YYYY-MM-DD` | Active statuses for date |
 | DELETE | `/status/:id` | Delete status by UUID |
 | GET | `/parade-state/platoons` | Available platoon numbers |
-| GET | `/parade-state?date=YYYY-MM-DD&platoon=1,2` | Generate parade state |
+| GET | `/parade-state?date=YYYY-MM-DD&platoon=1,2&time=HHMM` | Generate parade state (`time` overrides EX_STAY_IN in/out for any date) |

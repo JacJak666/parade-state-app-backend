@@ -1,15 +1,23 @@
 import type { FastifyPluginAsync } from 'fastify';
+import { z } from 'zod';
 import { addRecruit, getAllRecruits, getRecruitById, deleteRecruit } from '../services/recruitService.js';
+
+const CreateRecruitBody = z.object({
+  id: z.string().regex(/^\d{4}$/, 'id must be a 4-digit number (e.g. 1101)'),
+});
 
 const recruitRoutes: FastifyPluginAsync = async (fastify) => {
   // POST /recruits
-  fastify.post<{ Body: { id: string } }>('/recruits', async (request, reply) => {
-    const { id } = request.body ?? {};
-    if (!id || typeof id !== 'string') {
-      return reply.code(400).send({ success: false, error: 'id is required and must be a string' });
+  fastify.post('/recruits', async (request, reply) => {
+    const parsed = CreateRecruitBody.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.code(400).send({
+        success: false,
+        error: parsed.error.issues.map(i => i.message).join('; '),
+      });
     }
     try {
-      const recruit = await addRecruit(id);
+      const recruit = await addRecruit(parsed.data.id);
       return reply.code(201).send({ success: true, data: recruit });
     } catch (err: any) {
       if (err.message.includes('already exists')) {

@@ -32,20 +32,16 @@ export function isDateInRange(date: Date, start: Date, end: Date): boolean {
   return (d.isSame(s) || d.isAfter(s)) && (d.isSame(e) || d.isBefore(e));
 }
 
-/** Normalize a date string (YYYY-MM-DD) or Date to midnight UTC */
-export function normalizeToDate(input: string | Date): Date {
-  return dayjs.utc(input).startOf('day').toDate();
-}
-
 /** Normalize a date string (YYYY-MM-DD) or Date to midnight SGT, returned as a UTC Date */
 export function normalizeToSGTDate(input: string | Date): Date {
   return dayjs(input).tz(SGT).startOf('day').toDate();
 }
 
-/** True if the current SGT wall-clock time is within the EX_STAY_IN book-in window (0800–2000) */
-export function isExStayInInCamp(): boolean {
-  const sgtHour = dayjs().tz(SGT).hour();
-  return sgtHour >= 8 && sgtHour < 20;
+/** True if the given SGT time (or current SGT clock if omitted) is within the EX_STAY_IN book-in window (0800–2000) */
+export function isExStayInInCamp(at?: { hour: number; minute: number }): boolean {
+  const sgt = at ?? { hour: dayjs().tz(SGT).hour(), minute: dayjs().tz(SGT).minute() };
+  const totalMinutes = sgt.hour * 60 + sgt.minute;
+  return totalMinutes >= 8 * 60 && totalMinutes < 20 * 60;
 }
 
 /** Zero-pad a number to 2 digits */

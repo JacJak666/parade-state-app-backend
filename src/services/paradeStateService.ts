@@ -30,7 +30,7 @@ export async function getAvailablePlatoons(): Promise<number[]> {
   return rows.map(r => r.platoon);
 }
 
-export async function generateParadeState(date?: Date, platoonFilter?: number[]): Promise<ParadeStateResult> {
+export async function generateParadeState(date?: Date, platoonFilter?: number[], time?: { hour: number; minute: number }): Promise<ParadeStateResult> {
   const targetDate = date ?? normalizeToSGTDate(new Date());
 
   // Fetch recruits, optionally filtered by platoon numbers
@@ -66,8 +66,11 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
   }
 
   const today = normalizeToSGTDate(new Date());
-  // For today: use the live SGT clock. For historical/future dates: always in-camp (deterministic).
-  const exStayInInCamp = targetDate.getTime() === today.getTime() ? isExStayInInCamp() : true;
+  // If an explicit time was provided, use it for any date.
+  // Otherwise: today uses the live SGT clock; historical/future dates default to in-camp (deterministic).
+  const exStayInInCamp = time
+    ? isExStayInInCamp(time)
+    : (targetDate.getTime() === today.getTime() ? isExStayInInCamp() : true);
 
   // Build per-platoon parade state
   const platoons: PlatoonParadeState[] = [];
@@ -82,9 +85,11 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
     const exStayIn: StatusEntry[] = [];
     const mcList: StatusEntry[] = [];
     const ldList: StatusEntry[] = [];
-    let ldInCampCount = 0;
+    const ldInCampRecruitIds = new Set<string>();
+    const ldTotalRecruitIds = new Set<string>();
     const exList: StatusEntry[] = [];
-    let exInCampCount = 0;
+    const exInCampRecruitIds = new Set<string>();
+    const exTotalRecruitIds = new Set<string>();
     const rsList: StatusEntry[] = [];
     const othersList: StatusEntry[] = [];
 
@@ -112,15 +117,17 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
 
           case 'LD':
             ldList.push(entry);
+            ldTotalRecruitIds.add(recruit.id);
             if (!recruitOutOfCamp) {
-              ldInCampCount++;
+              ldInCampRecruitIds.add(recruit.id);
             }
             break;
 
           case 'EX':
             exList.push(entry);
+            exTotalRecruitIds.add(recruit.id);
             if (!recruitOutOfCamp) {
-              exInCampCount++;
+              exInCampRecruitIds.add(recruit.id);
             }
             break;
 
@@ -158,9 +165,11 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
       exStayInInCamp,
       mcList,
       ldList,
-      ldInCampCount,
+      ldInCampCount: ldInCampRecruitIds.size,
+      ldTotalCount: ldTotalRecruitIds.size,
       exList,
-      exInCampCount,
+      exInCampCount: exInCampRecruitIds.size,
+      exTotalCount: exTotalRecruitIds.size,
       rsList,
       othersList,
     });
