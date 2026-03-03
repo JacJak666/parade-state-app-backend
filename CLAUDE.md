@@ -65,7 +65,7 @@ HTTP Request
 | OTHERS | Determined by `outOfCamp` field on the record (user-selectable at creation) |
 | All others | No (in-camp) |
 
-In/out for `EX_STAY_IN` is determined by the **current real-time SGT clock** via `isExStayInInCamp()` in `src/utils/dateUtils.ts`, regardless of the queried date.
+In/out for `EX_STAY_IN` depends on the queried date: if querying **today**, it uses the real-time SGT clock via `isExStayInInCamp()`; if querying any **other date** (historical or future), EX_STAY_IN is always treated as in-camp (deterministic).
 
 ### Parade State Output Format
 

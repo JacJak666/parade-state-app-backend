@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma.js';
-import { normalizeToSGTDate } from '../utils/dateUtils.js';
+import { normalizeToSGTDate, formatDateToDDMMYY } from '../utils/dateUtils.js';
 import type { StatusRecord, CreateStatusInput } from '../types/index.js';
 
 export async function addStatus(input: CreateStatusInput): Promise<StatusRecord> {
@@ -31,7 +31,7 @@ export async function addStatus(input: CreateStatusInput): Promise<StatusRecord>
     });
     if (overlapping) {
       throw new Error(
-        `MC overlap: recruit ${recruitId} already has MC from ${overlapping.startDate.toISOString().slice(0, 10)} to ${overlapping.endDate.toISOString().slice(0, 10)}`
+        `MC overlap: recruit ${recruitId} already has MC from ${formatDateToDDMMYY(overlapping.startDate)} to ${formatDateToDDMMYY(overlapping.endDate)}`
       );
     }
   }

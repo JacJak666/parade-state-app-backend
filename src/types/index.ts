@@ -39,8 +39,8 @@ export interface PlatoonParadeState {
   exStayIn: StatusEntry[];
   exStayInInCamp: boolean;   // true if current SGT time is 0800–2000
   mcList: StatusEntry[];
-  statusUniqueCount: number; // unique recruits with in-camp statuses
   ldList: StatusEntry[];
+  ldInCampCount: number;     // LD entries whose recruit is not overridden out-of-camp
   exList: StatusEntry[];     // all EX entries with full detail
   exInCampCount: number;     // EX entries whose recruit is not overridden out-of-camp
   rsList: StatusEntry[];

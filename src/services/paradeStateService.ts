@@ -3,7 +3,7 @@ import { normalizeToSGTDate, isExStayInInCamp } from '../utils/dateUtils.js';
 import type { StatusRecord, Recruit, StatusEntry, PlatoonParadeState, ParadeStateResult } from '../types/index.js';
 
 /** Determine if a status record means the recruit is out of camp */
-function isOutOfCamp(status: StatusRecord): boolean {
+function isOutOfCamp(status: StatusRecord, exStayInInCamp: boolean): boolean {
   switch (status.type) {
     case 'MC':
     case 'SEND_OUT_URGENT':
@@ -12,7 +12,7 @@ function isOutOfCamp(status: StatusRecord): boolean {
     case 'EX':
       return false;  // always in camp
     case 'EX_STAY_IN':
-      return !isExStayInInCamp();
+      return !exStayInInCamp;
     case 'OTHERS':
       return status.outOfCamp;
     default:
@@ -65,7 +65,9 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
     platoonMap.set(recruit.platoon, list);
   }
 
-  const exStayInInCamp = isExStayInInCamp();
+  const today = normalizeToSGTDate(new Date());
+  // For today: use the live SGT clock. For historical/future dates: always in-camp (deterministic).
+  const exStayInInCamp = targetDate.getTime() === today.getTime() ? isExStayInInCamp() : true;
 
   // Build per-platoon parade state
   const platoons: PlatoonParadeState[] = [];
@@ -80,19 +82,18 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
     const exStayIn: StatusEntry[] = [];
     const mcList: StatusEntry[] = [];
     const ldList: StatusEntry[] = [];
+    let ldInCampCount = 0;
     const exList: StatusEntry[] = [];
     let exInCampCount = 0;
     const rsList: StatusEntry[] = [];
     const othersList: StatusEntry[] = [];
-
-    const inCampStatusRecruitIds = new Set<string>();
 
     for (const recruit of platoonRecruits) {
       const statuses = statusMap.get(recruit.id) ?? [];
 
       let recruitOutOfCamp = false;
       for (const s of statuses) {
-        if (isOutOfCamp(s)) {
+        if (isOutOfCamp(s, exStayInInCamp)) {
           recruitOutOfCamp = true;
           break;
         }
@@ -112,39 +113,29 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
           case 'LD':
             ldList.push(entry);
             if (!recruitOutOfCamp) {
-              inCampStatusRecruitIds.add(recruit.id);
+              ldInCampCount++;
             }
             break;
 
           case 'EX':
             exList.push(entry);
             if (!recruitOutOfCamp) {
-              inCampStatusRecruitIds.add(recruit.id);
               exInCampCount++;
             }
             break;
 
           case 'EX_STAY_IN':
             exStayIn.push(entry);
-            if (exStayInInCamp && !recruitOutOfCamp) {
-              inCampStatusRecruitIds.add(recruit.id);
-            }
             break;
 
           case 'REPORTING_SICK':
             rsList.push(entry);
-            if (!recruitOutOfCamp) {
-              inCampStatusRecruitIds.add(recruit.id);
-            }
             break;
 
           case 'SEND_OUT_URGENT':
           case 'SEND_OUT_NON_URGENT':
           case 'OTHERS':
             othersList.push(entry);
-            if (!isOutOfCamp(s) && !recruitOutOfCamp) {
-              inCampStatusRecruitIds.add(recruit.id);
-            }
             break;
         }
       }
@@ -166,8 +157,8 @@ export async function generateParadeState(date?: Date, platoonFilter?: number[])
       exStayIn,
       exStayInInCamp,
       mcList,
-      statusUniqueCount: inCampStatusRecruitIds.size,
       ldList,
+      ldInCampCount,
       exList,
       exInCampCount,
       rsList,
