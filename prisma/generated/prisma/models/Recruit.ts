@@ -1193,6 +1193,7 @@ export type RecruitCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data used to create many Recruits.
    */
   data: Prisma.RecruitCreateManyInput | Prisma.RecruitCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1211,6 +1212,7 @@ export type RecruitCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many Recruits.
    */
   data: Prisma.RecruitCreateManyInput | Prisma.RecruitCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

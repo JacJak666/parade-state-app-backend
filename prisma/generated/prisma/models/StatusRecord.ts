@@ -460,6 +460,7 @@ export type StatusRecordCreateOrConnectWithoutRecruitInput = {
 
 export type StatusRecordCreateManyRecruitInputEnvelope = {
   data: Prisma.StatusRecordCreateManyRecruitInput | Prisma.StatusRecordCreateManyRecruitInput[]
+  skipDuplicates?: boolean
 }
 
 export type StatusRecordUpsertWithWhereUniqueWithoutRecruitInput = {
@@ -1267,6 +1268,7 @@ export type StatusRecordCreateManyArgs<ExtArgs extends runtime.Types.Extensions.
    * The data used to create many StatusRecords.
    */
   data: Prisma.StatusRecordCreateManyInput | Prisma.StatusRecordCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1285,6 +1287,7 @@ export type StatusRecordCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    * The data used to create many StatusRecords.
    */
   data: Prisma.StatusRecordCreateManyInput | Prisma.StatusRecordCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

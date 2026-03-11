@@ -1,6 +1,16 @@
 import { prisma } from '../lib/prisma.js';
 import { normalizeToSGTDate, formatDateToDDMMYY } from '../utils/dateUtils.js';
-import type { StatusRecord, CreateStatusInput } from '../types/index.js';
+import type { StatusRecord, CreateStatusInput, StatusType } from '../types/index.js';
+
+// MC, SEND_OUT_URGENT, SEND_OUT_NON_URGENT are mutually exclusive with each other.
+// All types are also mutually exclusive with themselves (same-type overlap).
+function getConflictTypes(type: StatusType): StatusType[] {
+  const mutualExclusionGroup: StatusType[] = ['MC', 'SEND_OUT_URGENT', 'SEND_OUT_NON_URGENT'];
+  if (mutualExclusionGroup.includes(type)) {
+    return mutualExclusionGroup;
+  }
+  return [type];
+}
 
 export async function addStatus(input: CreateStatusInput): Promise<StatusRecord> {
   const { recruitId, type, startDate: startStr, endDate: endStr, remark, outOfCamp } = input;
@@ -19,21 +29,22 @@ export async function addStatus(input: CreateStatusInput): Promise<StatusRecord>
     throw new Error('endDate must be on or after startDate');
   }
 
-  // MC overlap check
-  if (type === 'MC') {
-    const overlapping = await prisma.statusRecord.findFirst({
-      where: {
-        recruitId,
-        type: 'MC',
-        startDate: { lte: endDate },
-        endDate: { gte: startDate },
-      },
-    });
-    if (overlapping) {
-      throw new Error(
-        `MC overlap: recruit ${recruitId} already has MC from ${formatDateToDDMMYY(overlapping.startDate)} to ${formatDateToDDMMYY(overlapping.endDate)}`
-      );
-    }
+  // Overlap / mutual-exclusion check
+  const conflictTypes = getConflictTypes(type);
+  const overlapping = await prisma.statusRecord.findFirst({
+    where: {
+      recruitId,
+      type: { in: conflictTypes },
+      startDate: { lte: endDate },
+      endDate: { gte: startDate },
+    },
+  });
+  if (overlapping) {
+    const isCrossType = overlapping.type !== type;
+    const msg = isCrossType
+      ? `overlap: recruit ${recruitId} already has ${overlapping.type} from ${formatDateToDDMMYY(overlapping.startDate)} to ${formatDateToDDMMYY(overlapping.endDate)} (conflicts with ${type})`
+      : `overlap: recruit ${recruitId} already has ${type} from ${formatDateToDDMMYY(overlapping.startDate)} to ${formatDateToDDMMYY(overlapping.endDate)}`;
+    throw new Error(msg);
   }
 
   return prisma.statusRecord.create({

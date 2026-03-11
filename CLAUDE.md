@@ -19,13 +19,14 @@ npm run db:reset     # Drop and re-migrate (destroys data)
 
 ## Architecture
 
-**Stack**: Fastify v5 + Prisma v7 + SQLite (better-sqlite3) + TypeScript (ESM/NodeNext)
+**Stack**: Fastify v5 + Prisma v7 + PostgreSQL (Supabase) + TypeScript (ESM/NodeNext)
 
 ### Key Prisma v7 Constraints
 
 - **Do not add `url` to `prisma/schema.prisma`** — Prisma v7 removed datasource `url` from schema files. The database URL is configured in `prisma.config.ts` only.
 - The generated client lives at `prisma/generated/prisma/` (not the default location). Imports use `../../prisma/generated/prisma/client.js`.
-- `@prisma/adapter-better-sqlite3` is required; the PrismaClient is instantiated with an adapter in `src/lib/prisma.ts`.
+- `@prisma/adapter-pg` is required; the PrismaClient is instantiated with a `PrismaPg` adapter in `src/lib/prisma.ts`.
+- `DATABASE_URL` must be set to the Supabase direct connection string (Project Settings → Database → Connection string → Direct).
 
 ### Request Flow
 

@@ -19,8 +19,8 @@ const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
   "clientVersion": "7.4.0",
   "engineVersion": "ab56fe763f921d033a6c195e7ddeb3e255bdbb57",
-  "activeProvider": "sqlite",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n}\n\nmodel Recruit {\n  id        String         @id // 4-digit string e.g. \"1203\"\n  platoon   Int\n  section   Int\n  bed       Int\n  createdAt DateTime       @default(now())\n  statuses  StatusRecord[]\n}\n\nenum StatusType {\n  MC\n  LD\n  EX\n  EX_STAY_IN\n  SEND_OUT_URGENT\n  SEND_OUT_NON_URGENT\n  REPORTING_SICK\n  OTHERS\n}\n\nmodel StatusRecord {\n  id        String     @id @default(uuid())\n  recruitId String\n  type      StatusType\n  startDate DateTime\n  endDate   DateTime\n  remark    String     @default(\"\")\n  outOfCamp Boolean    @default(false)\n  createdAt DateTime   @default(now())\n\n  recruit Recruit @relation(fields: [recruitId], references: [id], onDelete: Cascade)\n\n  @@index([recruitId])\n  @@index([startDate, endDate])\n}\n",
+  "activeProvider": "postgresql",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"./generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Recruit {\n  id        String         @id // 4-digit string e.g. \"1203\"\n  platoon   Int\n  section   Int\n  bed       Int\n  createdAt DateTime       @default(now())\n  statuses  StatusRecord[]\n}\n\nenum StatusType {\n  MC\n  LD\n  EX\n  EX_STAY_IN\n  SEND_OUT_URGENT\n  SEND_OUT_NON_URGENT\n  REPORTING_SICK\n  OTHERS\n}\n\nmodel StatusRecord {\n  id        String     @id @default(uuid())\n  recruitId String\n  type      StatusType\n  startDate DateTime\n  endDate   DateTime\n  remark    String     @default(\"\")\n  outOfCamp Boolean    @default(false)\n  createdAt DateTime   @default(now())\n\n  recruit Recruit @relation(fields: [recruitId], references: [id], onDelete: Cascade)\n\n  @@index([recruitId])\n  @@index([startDate, endDate])\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -45,10 +45,10 @@ async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Modul
 }
 
 config.compilerWasm = {
-  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.sqlite.mjs"),
+  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.mjs"),
 
   getQueryCompilerWasmModule: async () => {
-    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.sqlite.wasm-base64.mjs")
+    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.mjs")
     return await decodeBase64AsWasm(wasm)
   },
 
